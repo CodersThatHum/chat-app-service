@@ -2,6 +2,7 @@ package com.codersthathum.chat_app_service.controller;
 
 import com.codersthathum.chat_app_service.dto.auth.LoginRequest;
 import com.codersthathum.chat_app_service.dto.auth.LoginResponse;
+import com.codersthathum.chat_app_service.dto.auth.RefreshTokenRequest;
 import com.codersthathum.chat_app_service.dto.auth.RegisterRequest;
 import com.codersthathum.chat_app_service.dto.http.HttpResponse;
 import com.codersthathum.chat_app_service.dto.user.UserDTO;
@@ -22,7 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 @Tag(name = "Authentication")
 public class AuthController {
 
-     private final AuthService authService;
+    private final AuthService authService;
 
     @PostMapping(path = "/api/v1/auth/register")
     public ResponseEntity<HttpResponse<Void>> register(
@@ -39,7 +40,7 @@ public class AuthController {
     }
 
     @PostMapping(path = "/api/v1/auth/login")
-    public ResponseEntity<HttpResponse<LoginResponse>> login (
+    public ResponseEntity<HttpResponse<LoginResponse>> login(
             @RequestBody LoginRequest param
     ) {
         LoginResponse data = this.authService.login(param);
@@ -63,5 +64,20 @@ public class AuthController {
                         userDTO
                 )
         );
+    }
+
+    @PostMapping("/api/v1/auth/refresh-token")
+    public ResponseEntity<HttpResponse<LoginResponse>> refreshToken(
+            @RequestBody RefreshTokenRequest refreshToken
+    ) {
+        LoginResponse data = this.authService.refreshToken(refreshToken);
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(
+                        HttpResponse.success(
+                                HttpStatus.OK,
+                                "Refresh token generated successfully",
+                                data
+                        )
+                );
     }
 }

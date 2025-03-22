@@ -30,6 +30,10 @@ public class UserSpecification {
                 predicates.add(cb.equal(root.get("isActive"), param.getIsActive()));
             }
 
+            if (param.getRefreshToken() != null) {
+                predicates.add(cb.equal(root.get("refreshToken"), param.getRefreshToken()));
+            }
+
             return cb.and(predicates.toArray(new Predicate[0]));
         };
     }

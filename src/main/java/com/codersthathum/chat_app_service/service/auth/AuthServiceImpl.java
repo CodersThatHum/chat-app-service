@@ -2,6 +2,7 @@ package com.codersthathum.chat_app_service.service.auth;
 
 import com.codersthathum.chat_app_service.dto.auth.LoginRequest;
 import com.codersthathum.chat_app_service.dto.auth.LoginResponse;
+import com.codersthathum.chat_app_service.dto.auth.RefreshTokenRequest;
 import com.codersthathum.chat_app_service.dto.auth.RegisterRequest;
 import com.codersthathum.chat_app_service.dto.user.UserParam;
 import com.codersthathum.chat_app_service.entity.User;
@@ -66,6 +67,29 @@ public class AuthServiceImpl implements AuthService {
                             ? new UnauthorizedException("invalid password")
                             : new ResourceNotFoundException("user not found");
                 });
+    }
+
+    public LoginResponse refreshToken(RefreshTokenRequest param) {
+        this.jwt.validateToken(param.getRefreshToken(), JWT.REFRESH_TOKEN_TYPE);
+
+        return this.userRepository.findOne(
+                        UserSpecification.param(UserParam.builder()
+                                .id(this.jwt.getUserIdFromToken(param.getRefreshToken()))
+                                .refreshToken(param.getRefreshToken())
+                                .isActive(true)
+                                .build()
+                        )
+                ).map(user -> {
+                    user.setRefreshToken(this.jwt.generateRefreshToken(user.getId()));
+                    userRepository.save(user);
+                    return user;
+                })
+                .map(user -> LoginResponse.builder()
+                        .accessToken(this.jwt.generateAccessToken(user.getId()))
+                        .refreshToken(user.getRefreshToken())
+                        .build()
+                )
+                .orElseThrow(() -> new UnauthorizedException("invalid refresh token"));
     }
 
 }

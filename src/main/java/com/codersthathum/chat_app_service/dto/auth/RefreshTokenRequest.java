@@ -1,4 +1,4 @@
-package com.codersthathum.chat_app_service.dto.user;
+package com.codersthathum.chat_app_service.dto.auth;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,15 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class UserParam {
-
-    private Long id;
-
-    private String name;
-
-    private String email;
-
-    private Boolean isActive;
+public class RefreshTokenRequest {
 
     private String refreshToken;
 
