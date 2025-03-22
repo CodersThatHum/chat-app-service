@@ -32,7 +32,7 @@ public class JWTFilter extends OncePerRequestFilter {
         Optional.ofNullable(request.getHeader("Authorization"))
                 .filter(header -> header.startsWith("Bearer "))
                 .map(header -> header.substring(7))
-                .filter(this.jwt::validateToken)
+                .filter(token -> jwt.validateToken(token, JWT.ACCESS_TOKEN_TYPE))
                 .map(token -> new JWTAuth(
                         this.userService.getUserByID(jwt.getUserIdFromToken(token)),
                         token

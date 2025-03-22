@@ -1,5 +1,7 @@
 package com.codersthathum.chat_app_service.util.jwt;
 
+import com.codersthathum.chat_app_service.exception.UnauthorizedException;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -17,10 +19,17 @@ public class JWT {
     @Value("${jwt.secret}")
     private String secretKey;
 
-    @Value("${jwt.expiration}")
-    private Long expiration;
+    @Value("${jwt.access-token.expiration}")
+    private Long accessTokenExpiration;
+
+    @Value("${jwt.refresh-token.expiration}")
+    private Long refreshTokenExpiration;
 
     private Key key;
+
+    public static final String ACCESS_TOKEN_TYPE = "access_token";
+
+    public static final String REFRESH_TOKEN_TYPE = "refresh_token";
 
     @PostConstruct
     public void init() {
@@ -28,24 +37,36 @@ public class JWT {
         this.key = Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(Long userId) {
+    public String generateAccessToken(Long userId) {
+        return generateToken(userId, ACCESS_TOKEN_TYPE);
+    }
+
+    public String generateRefreshToken(Long userId) {
+        return generateToken(userId, REFRESH_TOKEN_TYPE);
+    }
+
+    private String generateToken(Long userId, String tokenType) {
         return Jwts.builder()
                 .setSubject(String.valueOf(userId))
+                .claim("type", tokenType)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date(System.currentTimeMillis() + expiration))
+                .setExpiration(new Date(System.currentTimeMillis() + (tokenType.equals(ACCESS_TOKEN_TYPE) ? accessTokenExpiration : refreshTokenExpiration)))
                 .signWith(this.key, SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    public boolean validateToken(String token) {
+    public boolean validateToken(String token, String type) {
         try {
-            Jwts.parserBuilder()
+            return Jwts.parserBuilder()
                     .setSigningKey(this.key)
                     .build()
-                    .parseClaimsJws(token);
-            return true;
+                    .parseClaimsJws(token)
+                    .getBody()
+                    .get("type", String.class).equals(type);
+        } catch (ExpiredJwtException e) {
+            throw new UnauthorizedException("Token has expired");
         } catch (Exception e) {
-            return false;
+            throw new UnauthorizedException(e.getMessage());
         }
     }
 
