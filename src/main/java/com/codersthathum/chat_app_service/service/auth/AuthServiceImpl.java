@@ -41,7 +41,7 @@ public class AuthServiceImpl implements AuthService {
     public LoginResponse login(LoginRequest param) {
         return userRepository.findByEmail(param.getEmail())
                 .filter(user -> passwordEncoder.matches(param.getPassword(), user.getPassword()))
-                .map(user -> LoginResponse.builder().accessToken(this.jwt.generateToken(user.getId())).build())
+                .map(user -> LoginResponse.builder().accessToken(this.jwt.generateAccessToken(user.getId())).build())
                 .orElseThrow(() -> {
                     // Determine which exception to throw based on whether user exists
                     return userRepository.existsByEmail(param.getEmail())
