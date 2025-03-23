@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: chat-app-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/chat_app
+    username: root
+    password: password
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  flyway:
+    enabled: true
+    baseline-on-migrate: true
+
+jwt:
+  secret:
+  access-token:
+    expiration:
+  refresh-token:
+    expiration:
+
+logging:
+  pattern:
+    console: 'timestamp=%clr(%d{yyyy-MM-dd HH:mm:ss.SSS}){faint} level=%clr(%-5p) pid=%clr(${PID:- }){magenta} requestId=[%clr(%-36.36X{requestId:-NO_REQUEST_ID}){yellow}] thread=%clr([%-15.15t]){faint} logger=%clr(%-40.40logger{39}){cyan} message=%m%n%wEx'
+
+  level:
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
