@@ -18,6 +18,12 @@ spring:
     enabled: true
     baseline-on-migrate: true
 
+rate-limiter:
+  enabled: true
+  capacity: 100
+  refill-tokens: 100
+  refill-duration: 60
+
 jwt:
   secret:
   access-token:
