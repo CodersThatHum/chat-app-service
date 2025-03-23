@@ -15,6 +15,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Optional;
 
 @Component
@@ -35,7 +36,8 @@ public class JWTFilter extends OncePerRequestFilter {
                 .filter(token -> jwt.validateToken(token, JWT.ACCESS_TOKEN_TYPE))
                 .map(token -> new JWTAuth(
                         this.userService.getUserByID(jwt.getUserIdFromToken(token)),
-                        token
+                        token,
+                        List.of()
                 ))
                 .ifPresent(SecurityContextHolder.getContext()::setAuthentication);
 

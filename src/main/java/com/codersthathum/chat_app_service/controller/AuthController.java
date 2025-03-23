@@ -9,6 +9,7 @@ import com.codersthathum.chat_app_service.dto.user.UserDTO;
 import com.codersthathum.chat_app_service.service.auth.AuthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,12 +28,14 @@ public class AuthController {
 
     @PostMapping(path = "/api/v1/auth/register")
     public ResponseEntity<HttpResponse<Void>> register(
+            HttpServletRequest request,
             @RequestBody RegisterRequest param
     ) {
         this.authService.register(param);
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(
                         HttpResponse.success(
+                                request,
                                 HttpStatus.CREATED,
                                 "User registered successfully"
                         )
@@ -41,12 +44,14 @@ public class AuthController {
 
     @PostMapping(path = "/api/v1/auth/login")
     public ResponseEntity<HttpResponse<LoginResponse>> login(
+            HttpServletRequest request,
             @RequestBody LoginRequest param
     ) {
         LoginResponse data = this.authService.login(param);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         HttpResponse.success(
+                                request,
                                 HttpStatus.OK,
                                 "User logged in successfully",
                                 data
@@ -56,9 +61,13 @@ public class AuthController {
 
     @GetMapping("/api/v1/auth/me")
     @SecurityRequirement(name = "BearerAuth")
-    public ResponseEntity<HttpResponse<UserDTO>> me(@AuthenticationPrincipal UserDTO userDTO) {
+    public ResponseEntity<HttpResponse<UserDTO>> me(
+            HttpServletRequest request,
+            @AuthenticationPrincipal UserDTO userDTO
+    ) {
         return ResponseEntity.ok(
                 HttpResponse.success(
+                        request,
                         HttpStatus.OK,
                         "User details retrieved successfully",
                         userDTO
@@ -68,12 +77,14 @@ public class AuthController {
 
     @PostMapping("/api/v1/auth/refresh-token")
     public ResponseEntity<HttpResponse<LoginResponse>> refreshToken(
+            HttpServletRequest request,
             @RequestBody RefreshTokenRequest refreshToken
     ) {
         LoginResponse data = this.authService.refreshToken(refreshToken);
         return ResponseEntity.status(HttpStatus.OK)
                 .body(
                         HttpResponse.success(
+                                request,
                                 HttpStatus.OK,
                                 "Refresh token generated successfully",
                                 data

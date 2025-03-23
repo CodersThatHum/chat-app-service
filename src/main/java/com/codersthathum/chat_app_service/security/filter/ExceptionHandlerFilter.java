@@ -28,17 +28,17 @@ public class ExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (UnauthorizedException e) {
-            handleException(response, HttpStatus.UNAUTHORIZED, e.getMessage());
+            handleException(request, response, HttpStatus.UNAUTHORIZED, e.getMessage());
         } catch (Exception e) {
-            handleException(response, HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error");
+            handleException(request, response, HttpStatus.INTERNAL_SERVER_ERROR,e.getMessage());
         }
     }
 
-    private void handleException(HttpServletResponse response, HttpStatus status, String message) throws IOException {
+    private void handleException(HttpServletRequest request, HttpServletResponse response, HttpStatus status, String message) throws IOException {
         response.setStatus(status.value());
         response.setContentType("application/json");
 
-        HttpResponse<Void> errorResponse = HttpResponse.error(status, message);
+        HttpResponse<Void> errorResponse = HttpResponse.error(request, status, message);
         response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }
