@@ -1,10 +1,7 @@
 package com.codersthathum.chat_app_service.controller;
 
 import com.codersthathum.chat_app_service.dto.http.HttpResponse;
-import com.codersthathum.chat_app_service.exception.DuplicateResourceException;
-import com.codersthathum.chat_app_service.exception.ForbiddenException;
-import com.codersthathum.chat_app_service.exception.ResourceNotFoundException;
-import com.codersthathum.chat_app_service.exception.UnauthorizedException;
+import com.codersthathum.chat_app_service.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -39,6 +36,13 @@ public class AppExceptionController {
         return ResponseEntity
                 .status(HttpStatus.FORBIDDEN)
                 .body(HttpResponse.error(HttpStatus.FORBIDDEN, ex.getMessage()));
+    }
+
+    @ExceptionHandler(TooManyRequestException.class)
+    public ResponseEntity<HttpResponse<Void>> handleTooManyRequestException(TooManyRequestException ex) {
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(HttpResponse.error(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage()));
     }
 
 }
